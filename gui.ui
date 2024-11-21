@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1174</width>
+    <height>680</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>COMPILER_FIRST_STAGE</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="styleSheet">
+       <string notr="true">/* Apply to the entire application */
+QWidget {
+    background-color: #1c1c1c; /* Dark gray background */
+    color: #f0f0f0; /* Light text color */
+
+}
+
+/* Apply to labels */
+QLabel {
+    color: #f44336; /* Bright red text color */
+    font-size: 16px; /* Adjusted font size for labels */
+    padding: 5px; /* Add padding for labels */
+}
+
+/* Apply to buttons */
+QPushButton {
+    background-color: #d32f2f; /* Bright red background */
+    border: none; /* No border */
+    color: #ffffff; /* White text color */
+    padding: 10px 20px; /* Padding inside the button */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Adjust font size */
+    margin: 5px; /* Margin around buttons */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+QPushButton:hover {
+    background-color: #e53935; /* Slightly brighter red on hover */
+}
+
+QPushButton:pressed {
+    background-color: #b71c1c; /* Darker red when pressed */
+}
+
+/* Apply to form frame */
+QFrame#formFrame {
+    background-color: #2e2e2e; /* Slightly lighter gray for formFrame */
+    border: 2px solid #d32f2f; /* Bright red border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 15px; /* Padding inside the frame */
+    margin: 10px; /* Margin around frame */
+}
+
+/* Apply to tab widget */
+QTabWidget::pane {
+    border: 1px solid #d32f2f; /* Bright red border around tab pane */
+    background-color: #1c1c1c; /* Dark background for tab pane */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding inside the tab pane */
+}
+
+
+QTabBar::tab {
+    background: #2e2e2e; /* Dark gray background for tabs */
+    color: #f0f0f0; /* Light text color */
+    border: 1px solid #d32f2f; /* Bright red border */
+    border-bottom-color: #1c1c1c; /* Same as pane background to blend */
+    border-radius: 5px 5px 0 0; /* Rounded top corners */
+    padding: 8px 16px; /* Padding inside tabs */
+    margin: 2px; /* Margin between tabs */
+}
+
+QTabBar::tab:selected {
+    background: #d32f2f; /* Bright red background for selected tab */
+    color: #ffffff; /* White text color for selected tab */
+}
+
+QTabBar::tab:hover {
+    background: #e53935; /* Slightly brighter red on hover */
+}
+
+/* Optional: Style for QLineEdit, QComboBox, etc. */
+QLineEdit, QComboBox {
+    background-color: #3e3e3e; /* Dark gray background */
+    border: 1px solid #d32f2f; /* Bright red border */
+    border-radius: 5px; /* Rounded corners */
+    color: #f0f0f0; /* Light text color */
+    padding: 5px; /* Padding inside the input */
+}
+</string>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Scanner</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="1" column="1">
+         <widget class="QTextBrowser" name="output">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTextEdit" name="input"/>
+        </item>
+        <item row="2" column="0" rowspan="2" colspan="2">
+         <widget class="QFrame" name="formFrame">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgba( 0, 0, 0, 75% );
+    border-radius: 10px;</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="scan">
+               <property name="styleSheet">
+                <string notr="true"> background-color: white;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+color:black;</string>
+               </property>
+               <property name="text">
+                <string>SCAN</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe Script</family>
+            <pointsize>-1</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>SCANNER</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
