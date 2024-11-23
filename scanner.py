@@ -1,4 +1,3 @@
-import re
 from PyQt5.QtGui import QTextCursor
 import PyQt5.QtWidgets
 import os
