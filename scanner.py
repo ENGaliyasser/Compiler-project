@@ -146,48 +146,27 @@ class Scanner:
                 # IN_NUM state (modified)
                 elif self.get_state('IN_NUM'):
                     if self.is_num(c):
-                        token += c
-                    elif c == ' ' or c == ';' or c == '\n':
-                        # Space, semicolon, or newline marks the end of a valid token
-                        self.classify(token, line_number)
-                        token = ''
-                        if c == ';':
-                            self.classify(c, line_number)  # Treat semicolon as a separate token
-                        self.set_state('START')
+                        token += c  # Append the numeric character to the token
                     else:
-                        # If an invalid character is found, log an error and discard the rest of the number
-                        error_token = token + c  # Start with the current invalid character
-                        while i + 1 <= len(line) and line[i + 1] not in [' ', ';', '\n']:
-                            i += 1
-                            error_token += line[i]
-                        self.errors.append((line_number, f"INVALID NUMBER: {error_token}"))
-                        stop_parsing = True  # Set the flag to stop parsing
-                        break  # Break out of the current loop
-                        token = ''  # Discard the token completely
-                        self.set_state('START')
+                        # End of the number token
+                        self.classify(token, line_number)  # Classify the valid numeric token
+                        token = ''  # Reset the token
+                        self.set_state('START')  # Go back to the start state
 
-                # IN_ID state
+                        # Re-evaluate the current character in the START state
+                        i -= 1  # Decrement `i` to reprocess this character in the next loop
+
                 elif self.get_state('IN_ID'):
                     if self.is_str(c):
-                        token += c
-                    elif c == ' ' or c == ';':
-                        # Space or semicolon marks the end of a valid token
-                        self.classify(token, line_number)
-                        token = ''
-                        if c == ';':
-                            self.classify(c, line_number)  # Treat semicolon as a separate token
-                        self.set_state('START')
+                        token += c  # Append the valid string character to the token
                     else:
-                        # If an invalid character is found, log an error and discard the rest of the identifier
-                        error_token = token + c  # Start with the current invalid character
-                        while i + 1 < len(line) and line[i + 1] not in [' ', ';']:
-                            i += 1
-                            error_token += line[i]
-                        self.errors.append((line_number, f"INVALID IDENTIFIER: {error_token}"))
-                        stop_parsing = True  # Set the flag to stop parsing
-                        break  # Break out of the current loop
-                        token = ''  # Discard the token completely
-                        self.set_state('START')
+                        # End of the identifier token
+                        self.classify(token, line_number)  # Classify the valid identifier token
+                        token = ''  # Reset the token
+                        self.set_state('START')  # Go back to the start state
+
+                        # Re-evaluate the current character in the START state
+                        i -= 1  # Decrement `i` to reprocess this character in the next loop
 
                 i += 1
 
