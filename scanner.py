@@ -47,6 +47,9 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         self.output.setPlainText("".join(output_content))  # Assuming `output_text` is a QTextBrowser in your UI
 
 
+keywords = ['read', 'if', 'then', 'repeat', 'until', 'write', 'end']
+
+
 class Scanner:
     STATES = {
         'START': False,
@@ -62,7 +65,7 @@ class Scanner:
         self.set_state('START')
         self.tokens = []
         self.errors = []
-        self.state_other = False
+        self.in_comment_block = False  # Track if inside a multiline comment
 
     def set_state(self, state):
         for key in self.STATES:
@@ -72,119 +75,147 @@ class Scanner:
     def get_state(self, state):
         return self.STATES[state]
 
-    def scan(self, input_text): #DFA implementation to scan input string as separate lines
+    def scan(self, input_text):
+        global comment_line
         lines = input_text.splitlines()
+        stop_parsing = False  # Flag to indicate parsing should stop
+
         for line_number, line in enumerate(lines, start=1):
+            if stop_parsing:
+                break  # Stop parsing if the flag is set
+
+            if not self.in_comment_block:
+                self.set_state('START')
+
             token = ''
-            for i, c in enumerate(line + ' '):  # Add space to force DONE state at end
+            i = 0
+            while i < len(line):
+                if stop_parsing:
+                    break  # Stop parsing if the flag is set
 
-                #Start State#
+                c = line[i]
 
-                if self.get_state('START'):
-                    if self.is_symbol(c):
-                        self.set_state('DONE')
-                    elif c == ' ':
-                        self.set_state('START')
-                        continue
+                if self.in_comment_block:
+                    # Handle multiline comments
+                    if c == '}':
+                        self.in_comment_block = False
                     elif c == '{':
-                        self.set_state('IN_COMMENT')
+                        self.errors.append((line_number, f"NOT ALLOWED NESTED COMMENT"))
+                        stop_parsing = True  # Set the flag to stop parsing
+                        break  # Break out of the current loop
+                    i += 1
+                    continue
+
+                # Start state
+                if self.get_state('START'):
+                    if c == '{':
+                        comment_line = line_number
+                        self.in_comment_block = True
+                    elif c == ':':
+                        if i+1 == len(line):
+                            self.errors.append((line_number, f"Invalid token: {c}"))
+                            stop_parsing = True  # Set the flag to stop parsing
+                            break  # Break out of the current loop
+                        self.set_state('IN_ASSIGN')
+                    elif self.is_symbol(c):
+                        self.classify(c, line_number)
                     elif self.is_num(c):
                         self.set_state('IN_NUM')
+                        token = c
                     elif self.is_str(c):
                         self.set_state('IN_ID')
-                    elif self.is_col(c):
-                        self.set_state('IN_ASSIGN')
-
-                #IN_COMMENT state#
-
-                elif self.get_state('IN_COMMENT'):
-                    if c == '}':
-                        self.set_state('DONE')
-                    else:
-                        self.set_state('IN_COMMENT')
-
-                #IN_NUMBER state#
-
-                elif self.get_state('IN_NUM'):
-                    if self.is_num(c):
-                        self.set_state('IN_NUM')
+                        token = c
                     elif c == ' ':
-                        self.set_state('DONE')
+                        # Ignore spaces
+                        pass
                     else:
-                        self.set_state('OTHER')
+                        self.errors.append((line_number, f"Invalid token: {c}"))
+                        stop_parsing = True  # Set the flag to stop parsing
+                        break  # Break out of the current loop
 
-                #IN_IDENTIFIER state#
-
-                elif self.get_state('IN_ID'):
-                    if self.is_str(c):
-                            self.set_state('IN_ID')
-                    elif c == ' ':
-                        self.set_state('DONE')
-                    else:
-                        self.set_state('OTHER')
-
-                #IN_ASSIGNMENT state#
-
+                # IN_ASSIGN state
                 elif self.get_state('IN_ASSIGN'):
                     if c == '=':
-                        self.set_state('DONE')
+                        self.classify(":=", line_number)  # Valid ASSIGN token
                     else:
-                        # Report ":" as an error if not followed by "="
-                        self.errors.append((line_number, "':' is not followed by '='"))
-                        self.classify(':', line_number)  # Classify the colon as an invalid token
-                        self.set_state('START')  # Reset state to process the next token
-                        token = ''  # Clear the token
-                        continue  # Reprocess current character as part of the next token
-
-
-                if not self.get_state('OTHER'): #Retrieve tokens#
-                    token += c
-
-                if self.get_state('OTHER'):
-                    self.set_state('DONE')
-                    self.state_other = True
-
-                #DONE state#
-
-                if self.get_state('DONE'):
-                    self.classify(token, line_number)
-                    if self.state_other:
-                        token = c
-                        if self.is_col(c): self.set_state('IN_ASSIGN')
-                        if self.is_comment(c): self.set_state('IN_COMMENT')
-                        if self.is_num(c): self.set_state('IN_NUM')
-                        if self.is_str(c): self.set_state('IN_ID')
-                        if self.is_symbol(c):
-                            self.classify(c, line_number)
-                            token = ''
-                            self.set_state('START')
-                        self.state_other = False
-                    else:
-                        token = ''
+                        self.errors.append((line_number, "Invalid token: ':'"))  # Standalone `:` is invalid
+                        stop_parsing = True  # Set the flag to stop parsing
+                        break  # Break out of the current loop
                     self.set_state('START')
+
+                # IN_NUM state (modified)
+                elif self.get_state('IN_NUM'):
+                    if self.is_num(c):
+                        token += c
+                    elif c == ' ' or c == ';' or c == '\n':
+                        # Space, semicolon, or newline marks the end of a valid token
+                        self.classify(token, line_number)
+                        token = ''
+                        if c == ';':
+                            self.classify(c, line_number)  # Treat semicolon as a separate token
+                        self.set_state('START')
+                    else:
+                        # If an invalid character is found, log an error and discard the rest of the number
+                        error_token = token + c  # Start with the current invalid character
+                        while i + 1 <= len(line) and line[i + 1] not in [' ', ';', '\n']:
+                            i += 1
+                            error_token += line[i]
+                        self.errors.append((line_number, f"INVALID NUMBER: {error_token}"))
+                        stop_parsing = True  # Set the flag to stop parsing
+                        break  # Break out of the current loop
+                        token = ''  # Discard the token completely
+                        self.set_state('START')
+
+                # IN_ID state
+                elif self.get_state('IN_ID'):
+                    if self.is_str(c):
+                        token += c
+                    elif c == ' ' or c == ';':
+                        # Space or semicolon marks the end of a valid token
+                        self.classify(token, line_number)
+                        token = ''
+                        if c == ';':
+                            self.classify(c, line_number)  # Treat semicolon as a separate token
+                        self.set_state('START')
+                    else:
+                        # If an invalid character is found, log an error and discard the rest of the identifier
+                        error_token = token + c  # Start with the current invalid character
+                        while i + 1 < len(line) and line[i + 1] not in [' ', ';']:
+                            i += 1
+                            error_token += line[i]
+                        self.errors.append((line_number, f"INVALID IDENTIFIER: {error_token}"))
+                        stop_parsing = True  # Set the flag to stop parsing
+                        break  # Break out of the current loop
+                        token = ''  # Discard the token completely
+                        self.set_state('START')
+
+                i += 1
+
+            # Finalize tokens at the end of the line
+            if token and not stop_parsing:
+                self.classify(token, line_number)
+
+        if self.in_comment_block and not stop_parsing:
+            self.errors.append((comment_line, f"UNCLOSED COMMENT"))
 
     KEYWORDS = ['else', 'end', 'if', 'repeat', 'then', 'until', 'read', 'write']
 
     OPERATORS = {
-        '+'         : 'PLUS',
-        '-'         : 'MINUS',
-        '*'         : 'MULT',
-        '/'         : 'DIV',
-        ':'         : 'COLON',
-        '='         : 'EQUAL',
-        ':='        : 'ASSIGN',
-        '<'         : 'LESSTHAN',
-        ';'         : 'SEMICOLON',
-        '('         : 'OPENBRACKET',
-        ')'         : 'CLOSEDBRACKET'
+        '+': 'PLUS',
+        '-': 'MINUS',
+        '*': 'MULT',
+        '/': 'DIV',
+        ':=': 'ASSIGN',
+        '=': 'EQUAL',
+        '<': 'LESSTHAN',
+        ';': 'SEMICOLON',
+        '(': 'OPENBRACKET',
+        ')': 'CLOSEDBRACKET'
     }
 
     def classify(self, token, line_number):
         if not token:
             return  # Skip empty tokens
-        if token[-1:] == ' ':
-            token = token[0:-1]
-
         if self.is_str(token):
             if token in self.KEYWORDS:
                 self.tokens.append((line_number, token, token.upper()))
@@ -194,75 +225,35 @@ class Scanner:
             self.tokens.append((line_number, token, 'NUMBER'))
         elif token in self.OPERATORS:
             self.tokens.append((line_number, token, self.OPERATORS[token]))
-        elif self.is_comment(token):
-            self.tokens.append((line_number, token, 'COMMENT'))
-        elif token == ':':
-            self.errors.append((line_number, "Unidentified token: ':'"))
         else:
             self.errors.append((line_number, f"Invalid token: {token}"))
 
-    #Helper functions#
-
+    # Helper functions
     def is_str(self, token):
-        return token.isalpha() #checks if all values of input string are alphabetical
+        return token.isalpha()
 
     def is_num(self, token):
-        return token.isdigit() #checks if all values of input string are numerical
-
-    def is_col(self, c):
-        return c == ':' #check for a colon : for the := operator
+        return token.isdigit()
 
     def is_symbol(self, token):
-        return token in ['+', '-', '*', '/', '=', '<', '>', '(', ')', ';'] #checks valid symbols
+        return token in ['+', '-', '*', '/', '=', '<', ';', '(', ')']
 
-    def is_comment(self, token):
-        return re.match(r'^{.+}$', token) is not None
-
-    #output as .txt file#
-
+    # Output as .txt file
     def output(self, output_file='scanner_output.txt'):
         with open(output_file, 'w') as file:
             file.write("Tokens:\n")
             file.write(f"{'Line':<5} {'Token':<12} {'Type':<12}\n")
             file.write(f"{'====':<5} {'====':<12} {'=====':<12}\n")
             for line_number, token, token_type in self.tokens:
-                file.write(f"{line_number:<5} {token_type:<12} {token:<12}\n")
+                file.write(f"{line_number:<5} {token:<12} {token_type:<12}\n")
 
             if self.errors:
                 file.write("\nErrors:\n")
                 for line_number, error in self.errors:
                     file.write(f"Line {line_number}: {error}\n")
 
-        #Optionally display the output in the console to quick test
-        """
-        print("\nTokens:")
-        print(f"{'Line':<5} {'Token':<12} {'Type':<12}")
-        print(f"{'====':<5} {'====':<12} {'=====':<12}")
-        for line_number, token, token_type in self.tokens:
-            print(f"{line_number:<5} {token_type:<12} {token:<12}")
-        
-        if self.errors:
-            print("\nErrors:")
-            for line_number, error in self.errors:
-                print(f"Line {line_number}: {error}")
-        
-        print(f"\nOutput saved to '{output_file}'")"""
 
 
-# def main():
-#     #testing#
-#     print("Enter tiny language code (end with an empty line):")
-#     user_input = []
-#     while True:
-#         line = input()
-#         if line == "":
-#             break
-#         user_input.append(line)
-#     user_code = "\n".join(user_input)
-#
-#     scanner = Scanner()
-#     scanner.scan(user_code)
-#     scanner.output()
 
 
 if __name__ == "__main__":
