@@ -9,19 +9,32 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
 
-
-
-
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         self.setupUi(MainWindow)
         self.thread = {}
+
         self.scan.clicked.connect(self.Scan)
+        self.Browse.clicked.connect(self.browse_file)  # Connect the browse button to the browse function
+
+    def browse_file(self):
+        options = QtWidgets.QFileDialog.Options()
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open Code File", "",
+                                                             "Text Files (*.txt);;All Files (*)", options=options)
+        if file_name:
+            # Read the content of the file
+
+            with open(file_name, 'r') as file:
+                file_content = file.read()
+            # Set the content of the file in the input QTextEdit
+
+            self.input.setPlainText(file_content)
+            self.Browseline.setText(str(file_name))  # Set the text of the line edit to the selected file name (file_name)
 
     def Scan(self):
-        print("Enter tiny language code (end with an empty line):")
+
         user_input = self.input.toPlainText().splitlines()
         user_code = "\n".join(user_input)
 
