@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtGui import QTextCursor, QFont
 import PyQt5.QtWidgets
 import os
 import numpy as np
@@ -6,8 +6,17 @@ import pandas as pd
 from gui import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-
-
+from parser import Parser
+from parser import Node
+from graphviz import Digraph
+from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtGui import QPen, QBrush
+from PyQt5.QtCore import Qt
+from parser import Node
+import graphviz
+from PIL import Image
+import matplotlib.pyplot as plt
+import networkx as nx
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
     def __init__(self):
@@ -17,6 +26,8 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
         self.scan.clicked.connect(self.Scan)
         self.Browse.clicked.connect(self.browse_file)  # Connect the browse button to the browse function
+
+
 
     def browse_file(self):
         options = QtWidgets.QFileDialog.Options()
@@ -41,7 +52,11 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         scanner = Scanner()
         scanner.scan(user_code)
         scanner.output()  # Save output to file
-
+        tree_image_path = 'syntax_tree.png'
+        if os.path.exists(tree_image_path):
+            pixmap = QtGui.QPixmap(tree_image_path)
+            self.tree_view_label.setPixmap(pixmap)
+            self.tree_view_label.setScaledContents(True)
         # Display tokens and errors in the QTextBrowser
         output_content = []
         output_content.append("Tokens:\n")
@@ -59,9 +74,11 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         self.output.setPlainText("".join(output_content))  # Assuming `output_text` is a QTextBrowser in your UI
 
 
+
+
 keywords = ['read', 'if', 'then', 'repeat', 'until', 'write', 'end']
 
-
+global_tokens_list = []
 class Scanner:
     STATES = {
         'START': False,
@@ -229,6 +246,49 @@ class Scanner:
     def is_symbol(self, token):
         return token in ['+', '-', '*', '/', '=', '<', ';', '(', ')']
 
+    def draw_syntax_tree(root):
+        """
+        Draws the syntax tree using Graphviz.
+
+        Args:
+            root (Node): The root of the syntax tree.
+        """
+        # Initialize a Digraph object
+        dot = Digraph(format='png')
+        dot.attr(rankdir='TB')  # Tree style (top-to-bottom)
+
+        def traverse(node, parent_name=None):
+            """
+            Recursively traverse the tree and add nodes/edges to the Graphviz graph.
+
+            Args:
+                node (Node): Current node in the tree.
+                parent_name (str): Name of the parent node.
+            """
+            if node is None:
+                return
+
+            # Add the current node to the graph
+            dot.node(node.name, node.name)
+
+            # Add an edge from the parent to the current node
+            if parent_name:
+                dot.edge(parent_name, node.name)
+
+            # Add child nodes
+            for child in node.children:
+                traverse(child, node.name)
+
+            # Traverse siblings
+            if node.sibling:
+                traverse(node.sibling, parent_name)
+
+        # Start the traversal from the root
+        traverse(root)
+
+        # Render the graph to a file and display it
+        dot.render('syntax_tree', view=True)
+
     # Output as .txt file
     def output(self, output_file='scanner_output.txt'):
         with open(output_file, 'w') as file:
@@ -242,6 +302,21 @@ class Scanner:
                 file.write("\nErrors:\n")
                 for line_number, error in self.errors:
                     file.write(f"Line {line_number}: {error}\n")
+            else:
+                # Populate the global list if there are no errors
+                global_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
+                parser = Parser(global_tokens_list)
+                try:
+                    tree_root = parser.program()
+                    print("The input program is valid. Syntax Tree:")
+                    print(tree_root)
+
+                except SyntaxError as e:
+                    print(e)
+
+
+
+
 
 
 
