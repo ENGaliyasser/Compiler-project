@@ -1,0 +1,14 @@
+Tokens:
+Line  Token        Type        
+====  ====         =====       
+1     read         READ        
+1     x            IDENTIFIER  
+1     ;            SEMICOLON   
+2     if           IF          
+2     0            NUMBER      
+2     <            LESSTHAN    
+2     x            IDENTIFIER  
+2     then         THEN        
+4     write        WRITE       
+4     fact         IDENTIFIER  
+5     end          END         

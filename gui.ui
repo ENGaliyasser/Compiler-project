@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>856</width>
-    <height>600</height>
+    <width>1149</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -115,7 +115,7 @@ QLineEdit, QComboBox {
 </string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -127,7 +127,7 @@ QLineEdit, QComboBox {
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>60</height>
+            <height>30</height>
            </size>
           </property>
           <property name="font">
@@ -143,15 +143,12 @@ QLineEdit, QComboBox {
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QTextEdit" name="input"/>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_2">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>60</height>
+            <height>16777215</height>
            </size>
           </property>
           <property name="font">
@@ -254,28 +251,12 @@ color:black;</string>
           </layout>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QTextBrowser" name="output">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>250</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="label">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>60</height>
+            <height>30</height>
            </size>
           </property>
           <property name="font">
@@ -291,76 +272,64 @@ color:black;</string>
           </property>
          </widget>
         </item>
+        <item row="3" column="0" rowspan="2">
+         <widget class="QTextEdit" name="input"/>
+        </item>
+        <item row="3" column="1" rowspan="2">
+         <widget class="QTextBrowser" name="output">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Parser">
        <attribute name="title">
         <string>Parser</string>
        </attribute>
-       <widget class="QLabel" name="label_10">
-        <property name="geometry">
-         <rect>
-          <x>220</x>
-          <y>40</y>
-          <width>396</width>
-          <height>29</height>
-         </rect>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>-1</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>OUTPUT TREE</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_12">
-        <property name="geometry">
-         <rect>
-          <x>18</x>
-          <y>10</y>
-          <width>798</width>
-          <height>29</height>
-         </rect>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>-1</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>PARSER</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QGraphicsView" name="graphicsView">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>71</y>
-          <width>811</width>
-          <height>431</height>
-         </rect>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>OUTPUT TREE</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGraphicsView" name="graphicsView"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="parse">
+          <property name="text">
+           <string>Parse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

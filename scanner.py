@@ -1,22 +1,69 @@
-from PyQt5.QtGui import QTextCursor, QFont
+import time
+
+from PyQt5.QtGui import QTextCursor, QFont, QPixmap
 import PyQt5.QtWidgets
 import os
 import numpy as np
 import pandas as pd
+from graphviz import Digraph
+
 from gui import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from parser import Parser
 from parser import Node
-from graphviz import Digraph
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import QPen, QBrush
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRectF
 from parser import Node
 import graphviz
 from PIL import Image
 import matplotlib.pyplot as plt
 import networkx as nx
+
+from graphviz import Digraph
+
+def draw_tree(root):
+    """
+    Draw the syntax tree structure using Graphviz.
+
+    Parameters:
+        root (Node): The root node of the tree.
+    """
+    dot = Digraph(format='png')  # Create a Graphviz Digraph
+
+    def traverse(node, parent_id=None):
+        if node is None:
+            return
+
+        # Add the current node to the graph
+        dot.node(node.name, label=node.name, shape=node.shape)
+
+        # If there's a parent, add an edge
+        if parent_id:
+            dot.edge(parent_id, node.name)
+
+        # Recursively add children
+        for child in node.children:
+            traverse(child, node.name)
+
+        # Process siblings
+        sibling = node.sibling
+        while sibling:
+            traverse(sibling, parent_id)
+            sibling = sibling.sibling
+
+    # Start traversal from the root
+    traverse(root)
+
+    # Render the tree
+    try:
+        filepath = dot.render('tree', view=True)
+        print(f"Syntax tree generated successfully: {filepath}")
+    except Exception as e:
+        print(f"Error while generating the syntax tree: {e}")
+
+
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
     def __init__(self):
@@ -26,6 +73,11 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
         self.scan.clicked.connect(self.Scan)
         self.Browse.clicked.connect(self.browse_file)  # Connect the browse button to the browse function
+        self.parse.clicked.connect(self.parser)  # Connect the browse button to the browse function
+        # Assuming you already have an instance of QGraphicsView, named self.graphicsView
+        # Assuming you have an existing QGraphicsView (self.graphicsView)
+
+
 
 
 
@@ -43,35 +95,62 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
             self.input.setPlainText(file_content)
             self.Browseline.setText(str(file_name))  # Set the text of the line edit to the selected file name (file_name)
 
+
+
     def Scan(self):
 
         user_input = self.input.toPlainText().splitlines()
         user_code = "\n".join(user_input)
 
         # Initialize scanner and perform scanning
-        scanner = Scanner()
-        scanner.scan(user_code)
-        scanner.output()  # Save output to file
-        tree_image_path = 'syntax_tree.png'
-        if os.path.exists(tree_image_path):
-            pixmap = QtGui.QPixmap(tree_image_path)
-            self.tree_view_label.setPixmap(pixmap)
-            self.tree_view_label.setScaledContents(True)
+        self.scanner = Scanner()
+        self.scanner.scan(user_code)
+        self.scanner.output()  # Save output to file
+
         # Display tokens and errors in the QTextBrowser
         output_content = []
         output_content.append("Tokens:\n")
         output_content.append(f"{'Line':<5} {'Token':<12} {'Type':<12}\n")
         output_content.append(f"{'====':<5} {'====':<12} {'=====':<12}\n")
-        for line_number, token, token_type in scanner.tokens:
+        for line_number, token, token_type in self.scanner.tokens:
             output_content.append(f"{line_number:<5} {token:<12} {token_type:<12}\n")
 
-        if scanner.errors:
+        if self.scanner.errors:
             output_content.append("\nErrors:\n")
-            for line_number, error in scanner.errors:
+            for line_number, error in self.scanner.errors:
                 output_content.append(f"Line {line_number}: {error}\n")
 
         # Join the content for display
         self.output.setPlainText("".join(output_content))  # Assuming `output_text` is a QTextBrowser in your UI
+
+
+        # # Create a simple tree
+        # dot = graphviz.Digraph()
+        # dot.node('A', 'Root')
+        # dot.node('B', 'Child 1')
+        # dot.node('C', 'Child 2')
+        # dot.edges(['AB', 'AC'])
+
+        # Save the tree as a PNG image
+        # dot.render('tree', format='png', cleanup=True)
+    def parser(self):
+        # Load the tree image
+        # Create a scene if it doesn't exist already
+        self.scanner.draw_syntax_tree()
+        time.sleep(0.5)  # Delay for half a second
+
+        if self.graphicsView.scene() is None:
+            scene = QGraphicsScene()  # Create a new scene
+            self.graphicsView.setScene(scene)  # Set the scene to the view
+        else:
+            scene = self.graphicsView.scene()  # Use the existing scene
+        scene.clear()  # Clear the previous content
+        pixmap = QPixmap("tree.png")
+        scene.addPixmap(pixmap)
+
+        scene.setSceneRect(QRectF(pixmap.rect()))  # Pass QRect directly to QRectF constructor
+
+        self.graphicsView.fitInView(QRectF(pixmap.rect()), mode=1)  # 1 corresponds to Qt.KeepAspectRatio
 
 
 
@@ -246,48 +325,66 @@ class Scanner:
     def is_symbol(self, token):
         return token in ['+', '-', '*', '/', '=', '<', ';', '(', ')']
 
-    def draw_syntax_tree(root):
+    def draw_syntax_tree(self):
         """
         Draws the syntax tree using Graphviz.
 
         Args:
             root (Node): The root of the syntax tree.
+            scanner (Scanner): The scanner object containing tokens.
         """
-        # Initialize a Digraph object
-        dot = Digraph(format='png')
-        dot.attr(rankdir='TB')  # Tree style (top-to-bottom)
+        # Extract the token list from the Scanner instance
 
-        def traverse(node, parent_name=None):
-            """
-            Recursively traverse the tree and add nodes/edges to the Graphviz graph.
 
-            Args:
-                node (Node): Current node in the tree.
-                parent_name (str): Name of the parent node.
-            """
-            if node is None:
-                return
+        globall_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
 
-            # Add the current node to the graph
-            dot.node(node.name, node.name)
+        parser = Parser(globall_tokens_list)
+        try:
+            tree_root = parser.program()
+            print("The input program is valid. Syntax Tree:")
+            print(tree_root)
 
-            # Add an edge from the parent to the current node
-            if parent_name:
-                dot.edge(parent_name, node.name)
+            # Draw the tree using the draw_tree function
+            dot = draw_tree(tree_root)
+            dot.render("tree", format="png", cleanup=True)  # Generates 'tree.png'
+        except Exception as e:
+            print(f"Error while generating the syntax tree: {e}")
 
-            # Add child nodes
-            for child in node.children:
-                traverse(child, node.name)
-
-            # Traverse siblings
-            if node.sibling:
-                traverse(node.sibling, parent_name)
-
-        # Start the traversal from the root
-        traverse(root)
-
-        # Render the graph to a file and display it
-        dot.render('syntax_tree', view=True)
+        # # Initialize a Digraph object
+        # dot = Digraph(format='png')
+        # dot.attr(rankdir='TB')  # Tree style (top-to-bottom)
+        #
+        # def traverse(node, parent_name=None):
+        #     """
+        #     Recursively traverse the tree and add nodes/edges to the Graphviz graph.
+        #
+        #     Args:
+        #         node (Node): Current node in the tree.
+        #         parent_name (str): Name of the parent node.
+        #     """
+        #     if node is None:
+        #         return
+        #
+        #     # Add the current node to the graph
+        #     dot.node(node.name, node.name)
+        #
+        #     # Add an edge from the parent to the current node
+        #     if parent_name:
+        #         dot.edge(parent_name, node.name)
+        #
+        #     # Add child nodes
+        #     for child in node.children:
+        #         traverse(child, node.name)
+        #
+        #     # Traverse siblings
+        #     if node.sibling:
+        #         traverse(node.sibling, parent_name)
+        #
+        # # Start the traversal from the root
+        # traverse(root)
+        #
+        # # Render the graph to a file and display it
+        # dot.render('syntax_tree', view=True)
 
     # Output as .txt file
     def output(self, output_file='scanner_output.txt'):
@@ -302,17 +399,9 @@ class Scanner:
                 file.write("\nErrors:\n")
                 for line_number, error in self.errors:
                     file.write(f"Line {line_number}: {error}\n")
-            else:
-                # Populate the global list if there are no errors
-                global_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
-                parser = Parser(global_tokens_list)
-                try:
-                    tree_root = parser.program()
-                    print("The input program is valid. Syntax Tree:")
-                    print(tree_root)
 
-                except SyntaxError as e:
-                    print(e)
+
+
 
 
 
