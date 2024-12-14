@@ -46,6 +46,8 @@ class Node:
         self.children = []
         self.sibling = None  # Pointer to the next sibling node
         self.shape = shape
+        self.x = 0  # X-coordinate (calculated dynamically)
+        self.y = 0  # Y-coordinate (calculated dynamically)
 
     def add_child(self, child):
         """Add a child node."""
@@ -113,6 +115,8 @@ class Parser:
                     return Node(f"const({matched_token[0]})","oval")
                 elif expected == "IDENTIFIER":
                     return Node(f"id({matched_token[0]})","oval")
+                elif expected == "REPEAT":
+                    return Node("repeat","rectangle")
                 else:
                     return Node(matched_token[0],"oval")  # Return the token value as a Node
         self.error(f"Expected {expected}, found {self.current_token}")

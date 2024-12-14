@@ -1,67 +1,111 @@
 import time
 
-from PyQt5.QtGui import QTextCursor, QFont, QPixmap
-import PyQt5.QtWidgets
-import os
-import numpy as np
-import pandas as pd
-from graphviz import Digraph
+from PyQt5.QtGui import QTextCursor, QFont, QPixmap, QFontMetrics
 
 from gui import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from parser import Parser
-from parser import Node
-from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtGui import QPen, QBrush
-from PyQt5.QtCore import Qt, QRectF
-from parser import Node
-import graphviz
-from PIL import Image
-import matplotlib.pyplot as plt
-import networkx as nx
+
 
 from graphviz import Digraph
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsScene, QGraphicsRectItem
+from PyQt5.QtGui import QPen, QBrush
+from PyQt5.QtCore import Qt, QPointF
 
-def draw_tree(root):
-    """
-    Draw the syntax tree structure using Graphviz.
+class SyntaxTreeDrawer:
+    def __init__(self, graphicsView, root_node):
+        self.graphicsView = graphicsView
+        self.root_node = root_node
+        self.scene = QGraphicsScene()
+        self.graphicsView.setScene(self.scene)
+        self.vertical_spacing = 100
+        self.horizontal_spacing = 60
+        self.text_padding = 10
 
-    Parameters:
-        root (Node): The root node of the tree.
-    """
-    dot = Digraph(format='png')  # Create a Graphviz Digraph
+    def draw_tree(self):
+        self.scene.clear()
+        # Determine the layout of the entire tree
+        positions = {}
+        self._calculate_positions(self.root_node, 0, 0, positions)
+        # Draw the tree based on calculated positions
+        self._draw_tree(self.root_node, positions)
+        self.graphicsView.setSceneRect(self.scene.itemsBoundingRect())
 
-    def traverse(node, parent_id=None):
-        if node is None:
+    def _calculate_positions(self, node, x, y, positions):
+        if not node:
+            return 0  # No width contribution for empty nodes
+
+        # Calculate width required for children first
+        children_width = 0
+        child_positions = []
+        for child in node.children:
+            child_width = self._calculate_positions(child, x + children_width, y + self.vertical_spacing, positions)
+            child_positions.append((child, x + children_width))
+            children_width += child_width + self.horizontal_spacing
+
+        # Calculate position for the current node
+        node_width = max(children_width - self.horizontal_spacing, self.horizontal_spacing)
+        node_x = x + (children_width - node_width) // 2
+        positions[node] = QPointF(node_x, y)
+
+        # Adjust sibling positions
+        if node.sibling:
+            sibling_width = self._calculate_positions(node.sibling, x + node_width + self.horizontal_spacing, y, positions)
+            node_width += sibling_width
+
+        return node_width
+
+    def _draw_tree(self, node, positions):
+        if not node:
             return
 
-        # Add the current node to the graph
-        dot.node(node.name, label=node.name, shape=node.shape)
+        # Retrieve the position of the current node
+        position = positions[node]
+        x, y = position.x(), position.y()
 
-        # If there's a parent, add an edge
-        if parent_id:
-            dot.edge(parent_id, node.name)
+        # Calculate size of the node based on text
+        text_item = QGraphicsTextItem(node.name)
+        font_metrics = QFontMetrics(text_item.font())
+        text_width = font_metrics.horizontalAdvance(node.name)
+        text_height = font_metrics.height()
+        shape_width = text_width + self.text_padding * 2
+        shape_height = text_height + self.text_padding * 2
 
-        # Recursively add children
+        # Draw the current node
+        if node.shape == "oval":
+            node_item = QGraphicsEllipseItem(x - shape_width / 2, y - shape_height / 2,
+                                             shape_width, shape_height)
+        elif node.shape == "rectangle":
+            node_item = QGraphicsRectItem(x - shape_width / 2, y - shape_height / 2,
+                                          shape_width, shape_height)
+        else:
+            raise ValueError(f"Unsupported shape: {node.shape}")
+
+        node_item.setBrush(QBrush(Qt.lightGray))
+        self.scene.addItem(node_item)
+
+        # Add text inside the node
+        text_item.setDefaultTextColor(Qt.black)
+        text_item.setPos(x - text_width / 2, y - text_height / 2)
+        self.scene.addItem(text_item)
+
+        # Draw connections to children
         for child in node.children:
-            traverse(child, node.name)
+            child_position = positions[child]
+            self.scene.addLine(x, y + shape_height / 2,
+                               child_position.x(), child_position.y() - shape_height / 2, QPen(Qt.black))
+            self._draw_tree(child, positions)  # Recursive call for children
 
-        # Process siblings
-        sibling = node.sibling
-        while sibling:
-            traverse(sibling, parent_id)
-            sibling = sibling.sibling
+        # Draw connection to sibling
+        if node.sibling:
+            sibling_position = positions[node.sibling]
+            self.scene.addLine(x + shape_width / 2, y,
+                               sibling_position.x() - shape_width / 2, sibling_position.y(), QPen(Qt.black))
+            self._draw_tree(node.sibling, positions)  # Recursive call for sibling
 
-    # Start traversal from the root
-    traverse(root)
+# Example Usage
 
-    # Render the tree
-    try:
-        filepath = dot.render('tree', view=True)
-        print(f"Syntax tree generated successfully: {filepath}")
-    except Exception as e:
-        print(f"Error while generating the syntax tree: {e}")
 
 
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
@@ -74,8 +118,6 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         self.scan.clicked.connect(self.Scan)
         self.Browse.clicked.connect(self.browse_file)  # Connect the browse button to the browse function
         self.parse.clicked.connect(self.parser)  # Connect the browse button to the browse function
-        # Assuming you already have an instance of QGraphicsView, named self.graphicsView
-        # Assuming you have an existing QGraphicsView (self.graphicsView)
 
 
 
@@ -124,33 +166,18 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         self.output.setPlainText("".join(output_content))  # Assuming `output_text` is a QTextBrowser in your UI
 
 
-        # # Create a simple tree
-        # dot = graphviz.Digraph()
-        # dot.node('A', 'Root')
-        # dot.node('B', 'Child 1')
-        # dot.node('C', 'Child 2')
-        # dot.edges(['AB', 'AC'])
 
-        # Save the tree as a PNG image
-        # dot.render('tree', format='png', cleanup=True)
     def parser(self):
         # Load the tree image
         # Create a scene if it doesn't exist already
-        self.scanner.draw_syntax_tree()
-        time.sleep(0.5)  # Delay for half a second
 
-        if self.graphicsView.scene() is None:
-            scene = QGraphicsScene()  # Create a new scene
-            self.graphicsView.setScene(scene)  # Set the scene to the view
-        else:
-            scene = self.graphicsView.scene()  # Use the existing scene
-        scene.clear()  # Clear the previous content
-        pixmap = QPixmap("tree.png")
-        scene.addPixmap(pixmap)
+        globall_tokens_list = [(token, token_type) for _, token, token_type in self.scanner.tokens]
+        parser = Parser(globall_tokens_list)
+        print(self.scanner.tokens)
+        root = parser.program()
+        drawer = SyntaxTreeDrawer(self.graphicsView, root)
+        drawer.draw_tree()
 
-        scene.setSceneRect(QRectF(pixmap.rect()))  # Pass QRect directly to QRectF constructor
-
-        self.graphicsView.fitInView(QRectF(pixmap.rect()), mode=1)  # 1 corresponds to Qt.KeepAspectRatio
 
 
 
@@ -325,66 +352,9 @@ class Scanner:
     def is_symbol(self, token):
         return token in ['+', '-', '*', '/', '=', '<', ';', '(', ')']
 
-    def draw_syntax_tree(self):
-        """
-        Draws the syntax tree using Graphviz.
-
-        Args:
-            root (Node): The root of the syntax tree.
-            scanner (Scanner): The scanner object containing tokens.
-        """
-        # Extract the token list from the Scanner instance
 
 
-        globall_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
 
-        parser = Parser(globall_tokens_list)
-        try:
-            tree_root = parser.program()
-            print("The input program is valid. Syntax Tree:")
-            print(tree_root)
-
-            # Draw the tree using the draw_tree function
-            dot = draw_tree(tree_root)
-            dot.render("tree", format="png", cleanup=True)  # Generates 'tree.png'
-        except Exception as e:
-            print(f"Error while generating the syntax tree: {e}")
-
-        # # Initialize a Digraph object
-        # dot = Digraph(format='png')
-        # dot.attr(rankdir='TB')  # Tree style (top-to-bottom)
-        #
-        # def traverse(node, parent_name=None):
-        #     """
-        #     Recursively traverse the tree and add nodes/edges to the Graphviz graph.
-        #
-        #     Args:
-        #         node (Node): Current node in the tree.
-        #         parent_name (str): Name of the parent node.
-        #     """
-        #     if node is None:
-        #         return
-        #
-        #     # Add the current node to the graph
-        #     dot.node(node.name, node.name)
-        #
-        #     # Add an edge from the parent to the current node
-        #     if parent_name:
-        #         dot.edge(parent_name, node.name)
-        #
-        #     # Add child nodes
-        #     for child in node.children:
-        #         traverse(child, node.name)
-        #
-        #     # Traverse siblings
-        #     if node.sibling:
-        #         traverse(node.sibling, parent_name)
-        #
-        # # Start the traversal from the root
-        # traverse(root)
-        #
-        # # Render the graph to a file and display it
-        # dot.render('syntax_tree', view=True)
 
     # Output as .txt file
     def output(self, output_file='scanner_output.txt'):
