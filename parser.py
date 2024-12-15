@@ -79,7 +79,7 @@ class Node:
         return ret
 
 
-
+operators = [')' , '(' , ';' , '<' , '=' , '/' , ':=' , '*' , '-' , '+' ]
 class Parser:
     def __init__(self, tokens_list):
         """Initialize the parser with a list of tokens."""
@@ -112,15 +112,16 @@ class Parser:
                 matched_token = self.current_token
                 self.advance()
                 if expected == "NUMBER":
-                    return Node(f"const({matched_token[0]})","oval")
-                elif expected == "IDENTIFIER":
-                    return Node(f"id({matched_token[0]})","oval")
+                    return Node(f"const({matched_token[0]})", "oval")
                 elif expected == "REPEAT":
-                    return Node("repeat","rectangle")
+                    return Node("repeat", "rectangle")
+                elif expected in operators:
+                    return Node(f"op({matched_token[0]})", "oval")
+                elif expected == "IDENTIFIER":
+                    return Node(f"id({matched_token[0]})", "oval")
                 else:
-                    return Node(matched_token[0],"oval")  # Return the token value as a Node
+                    return Node(matched_token[0], "oval")  # Return the token value as a Node
         self.error(f"Expected {expected}, found {self.current_token}")
-
     def check_for_semicolon(self):
         """Ensure the current statement is followed by a semicolon, unless it's the last statement."""
         if self.current_token is None:

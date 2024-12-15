@@ -1,6 +1,6 @@
 import time
 
-from PyQt5.QtGui import QTextCursor, QFont, QPixmap, QFontMetrics
+from PyQt5.QtGui import QTextCursor, QFont, QPixmap, QFontMetrics, QColor
 
 from gui import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -12,6 +12,189 @@ from graphviz import Digraph
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsScene, QGraphicsRectItem
 from PyQt5.QtGui import QPen, QBrush
 from PyQt5.QtCore import Qt, QPointF
+
+# class SyntaxTreeDrawer:
+#     def __init__(self, graphicsView, root_node):
+#         self.graphicsView = graphicsView
+#         self.root_node = root_node
+#         self.scene = QGraphicsScene()
+#         self.graphicsView.setScene(self.scene)
+#         self.vertical_spacing = 100
+#         self.horizontal_spacing = 60
+#         self.text_padding = 10
+#
+#     def draw_tree(self):
+#         self.scene.clear()
+#         # Determine the layout of the entire tree
+#         positions = {}
+#         self._calculate_positions(self.root_node, 0, 0, positions)
+#         # Draw the tree based on calculated positions
+#         self._draw_tree(self.root_node, positions)
+#         self.graphicsView.setSceneRect(self.scene.itemsBoundingRect())
+#
+#     def _calculate_positions(self, node, x, y, positions):
+#         if not node:
+#             return 0  # No width contribution for empty nodes
+#
+#         # Calculate width required for children first
+#         children_width = 0
+#         child_positions = []
+#         for child in node.children:
+#             child_width = self._calculate_positions(child, x + children_width, y + self.vertical_spacing, positions)
+#             child_positions.append((child, x + children_width))
+#             children_width += child_width + self.horizontal_spacing
+#
+#         # Calculate position for the current node
+#         node_width = max(children_width - self.horizontal_spacing, self.horizontal_spacing)
+#         node_x = x + (children_width - node_width) // 2
+#         positions[node] = QPointF(node_x, y)
+#
+#         # Adjust sibling positions
+#         if node.sibling:
+#             sibling_width = self._calculate_positions(node.sibling, x + node_width + self.horizontal_spacing, y, positions)
+#             node_width += sibling_width
+#
+#         return node_width
+#
+#     def _draw_tree(self, node, positions):
+#         if not node:
+#             return
+#
+#         # Retrieve the position of the current node
+#         position = positions[node]
+#         x, y = position.x(), position.y()
+#
+#         # Calculate size of the node based on text
+#         text_item = QGraphicsTextItem(node.name)
+#         font_metrics = QFontMetrics(text_item.font())
+#         text_width = font_metrics.horizontalAdvance(node.name)
+#         text_height = font_metrics.height()
+#         shape_width = text_width + self.text_padding * 2
+#         shape_height = text_height + self.text_padding * 2
+#
+#         # Draw the current node
+#         if node.shape == "oval":
+#             node_item = QGraphicsEllipseItem(x - shape_width / 2, y - shape_height / 2,
+#                                              shape_width, shape_height)
+#         elif node.shape == "rectangle":
+#             node_item = QGraphicsRectItem(x - shape_width / 2, y - shape_height / 2,
+#                                           shape_width, shape_height)
+#         else:
+#             raise ValueError(f"Unsupported shape: {node.shape}")
+#
+#         node_item.setBrush(QBrush(Qt.lightGray))
+#         self.scene.addItem(node_item)
+#
+#         # Add text inside the node
+#         text_item.setDefaultTextColor(Qt.black)
+#         text_item.setPos(x - text_width / 2, y - text_height / 2)
+#         self.scene.addItem(text_item)
+#
+#         # Draw connections to children
+#         for child in node.children:
+#             child_position = positions[child]
+#             self.scene.addLine(x, y + shape_height / 2,
+#                                child_position.x(), child_position.y() - shape_height / 2, QPen(Qt.black))
+#             self._draw_tree(child, positions)  # Recursive call for children
+#
+#         # Draw connection to sibling
+#         if node.sibling:
+#             sibling_position = positions[node.sibling]
+#             self.scene.addLine(x + shape_width / 2, y,
+#                                sibling_position.x() - shape_width / 2, sibling_position.y(), QPen(Qt.black))
+#             self._draw_tree(node.sibling, positions)  # Recursive call for sibling
+
+# Example Usage working
+# class SyntaxTreeDrawer:
+#     def __init__(self, graphicsView, root_node):
+#         self.graphicsView = graphicsView
+#         self.root_node = root_node
+#         self.scene = QGraphicsScene()
+#         self.graphicsView.setScene(self.scene)
+#         self.vertical_spacing = 100
+#         self.horizontal_spacing = 60
+#         self.text_padding = 10
+#
+#     def draw_tree(self):
+#         self.scene.clear()
+#         # Determine the layout of the entire tree
+#         positions = {}
+#         self._calculate_positions(self.root_node, 0, 0, positions)
+#         # Draw the tree based on calculated positions
+#         self._draw_tree(self.root_node, positions)
+#         self.graphicsView.setSceneRect(self.scene.itemsBoundingRect())
+#
+#     def _calculate_positions(self, node, x, y, positions):
+#         if not node:
+#             return 0  # No width contribution for empty nodes
+#
+#         # Calculate width required for children first
+#         children_width = 0
+#         child_positions = []
+#         for child in node.children:
+#             child_width = self._calculate_positions(child, x + children_width, y + self.vertical_spacing, positions)
+#             child_positions.append((child, x + children_width))
+#             children_width += child_width + self.horizontal_spacing
+#
+#         # Calculate position for the current node
+#         node_width = max(children_width - self.horizontal_spacing, self.horizontal_spacing)
+#         node_x = x + (children_width - node_width) // 2
+#         positions[node] = QPointF(node_x, y)
+#
+#         # Adjust sibling positions
+#         if node.sibling:
+#             sibling_width = self._calculate_positions(node.sibling, x + node_width + self.horizontal_spacing, y, positions)
+#             node_width += sibling_width
+#
+#         return node_width
+#
+#     def _draw_tree(self, node, positions):
+#         if not node:
+#             return
+#
+#         # Retrieve the position of the current node
+#         position = positions[node]
+#         x, y = position.x(), position.y()
+#
+#         # Calculate size of the node based on text
+#         text_item = QGraphicsTextItem(node.name)
+#         font_metrics = QFontMetrics(text_item.font())
+#         text_width = font_metrics.horizontalAdvance(node.name)
+#         text_height = font_metrics.height()
+#         shape_width = text_width + self.text_padding * 2
+#         shape_height = text_height + self.text_padding * 2
+#
+#         # Draw the current node
+#         if node.shape == "oval":
+#             node_item = QGraphicsEllipseItem(x - shape_width / 2, y - shape_height / 2,
+#                                              shape_width, shape_height)
+#         elif node.shape == "rectangle":
+#             node_item = QGraphicsRectItem(x - shape_width / 2, y - shape_height / 2,
+#                                           shape_width, shape_height)
+#         else:
+#             raise ValueError(f"Unsupported shape: {node.shape}")
+#
+#         node_item.setBrush(QBrush(QColor(200, 230, 255)))  # Light blue background for nodes
+#         self.scene.addItem(node_item)
+#
+#         # Add text inside the node
+#         text_item.setDefaultTextColor(Qt.black)
+#         text_item.setPos(x - text_width / 2, y - text_height / 2)
+#         self.scene.addItem(text_item)
+#
+#         # Draw connections to children
+#         for child in node.children:
+#             child_position = positions[child]
+#             self.scene.addLine(x, y + shape_height / 2,
+#                                child_position.x(), child_position.y() - shape_height / 2, QPen(QColor(0, 128, 0), 2))  # Green edges with width 2
+#             self._draw_tree(child, positions)  # Recursive call for children
+#
+#         # Draw connection to sibling
+#         if node.sibling:
+#             sibling_position = positions[node.sibling]
+#             self.scene.addLine(x + shape_width / 2, y,
+#                                sibling_position.x() - shape_width / 2, sibling_position.y(), QPen(QColor(255, 69, 0), 2))  # Orange edges with width 2
+#             self._draw_tree(node.sibling, positions)  # Recursive call for sibling
 
 class SyntaxTreeDrawer:
     def __init__(self, graphicsView, root_node):
@@ -82,7 +265,7 @@ class SyntaxTreeDrawer:
         else:
             raise ValueError(f"Unsupported shape: {node.shape}")
 
-        node_item.setBrush(QBrush(Qt.lightGray))
+        node_item.setBrush(QBrush(QColor(200, 230, 255)))  # Light blue background for nodes
         self.scene.addItem(node_item)
 
         # Add text inside the node
@@ -94,19 +277,15 @@ class SyntaxTreeDrawer:
         for child in node.children:
             child_position = positions[child]
             self.scene.addLine(x, y + shape_height / 2,
-                               child_position.x(), child_position.y() - shape_height / 2, QPen(Qt.black))
+                               child_position.x(), child_position.y() - shape_height / 2, QPen(QColor(0, 128, 0), 2))  # Green edges with width 2
             self._draw_tree(child, positions)  # Recursive call for children
 
         # Draw connection to sibling
         if node.sibling:
             sibling_position = positions[node.sibling]
             self.scene.addLine(x + shape_width / 2, y,
-                               sibling_position.x() - shape_width / 2, sibling_position.y(), QPen(Qt.black))
+                               (sibling_position.x() - shape_width / 2)+ 40, y, QPen(QColor(255, 69, 0), 2))  # Orange edges with width 2
             self._draw_tree(node.sibling, positions)  # Recursive call for sibling
-
-# Example Usage
-
-
 
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
