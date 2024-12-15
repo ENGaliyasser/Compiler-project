@@ -4,7 +4,6 @@ from PyQt5.QtGui import QTextCursor, QFont, QPixmap
 import PyQt5.QtWidgets
 import os
 import numpy as np
-import pandas as pd
 from graphviz import Digraph
 
 from gui import Ui_MainWindow
@@ -17,40 +16,59 @@ from PyQt5.QtGui import QPen, QBrush
 from PyQt5.QtCore import Qt, QRectF
 from parser import Node
 import graphviz
-from PIL import Image
-import matplotlib.pyplot as plt
-import networkx as nx
+
 
 from graphviz import Digraph
 
 def draw_tree(root):
     """
-    Draw the syntax tree structure using Graphviz.
+    Draw the syntax tree structure using Graphviz, ensuring unique node identifiers,
+    placing sibling nodes on the same horizontal level, and properly ordering siblings and children.
 
     Parameters:
         root (Node): The root node of the tree.
     """
-    dot = Digraph(format='png')  # Create a Graphviz Digraph
+    dot = Digraph(format='png', graph_attr={'rankdir': 'TB'})  # Top-to-Bottom layout
 
     def traverse(node, parent_id=None):
         if node is None:
             return
 
+        # Create a unique identifier for the node
+        node_id = str(id(node))
+
         # Add the current node to the graph
-        dot.node(node.name, label=node.name, shape=node.shape)
+        dot.node(node_id, label=node.name, shape=node.shape)
 
-        # If there's a parent, add an edge
+        # Connect to the parent if specified
         if parent_id:
-            dot.edge(parent_id, node.name)
+            dot.edge(parent_id, node_id)
 
-        # Recursively add children
-        for child in node.children:
-            traverse(child, node.name)
-
-        # Process siblings
-        sibling = node.sibling
+        # Handle siblings at the same level
+        sibling_group = []
+        sibling = node
         while sibling:
-            traverse(sibling, parent_id)
+            sibling_id = str(id(sibling))
+            dot.node(sibling_id, label=sibling.name, shape=sibling.shape)
+            sibling_group.append(sibling_id)
+            sibling = sibling.sibling
+
+        # Ensure siblings are at the same level and connect them with horizontal edges
+        if len(sibling_group) > 1:
+            with dot.subgraph() as s:
+                s.attr(rank="same")  # Align siblings horizontally
+                for sibling_id in sibling_group:
+                    s.node(sibling_id)
+            # Add horizontal edges between siblings
+            for i in range(len(sibling_group) - 1):
+                dot.edge(sibling_group[i], sibling_group[i + 1], constraint="false")
+
+        # Traverse the children for the node and its siblings
+        sibling = node
+        while sibling:
+            # Traverse children before processing the next sibling
+            for child in sibling.children:
+                traverse(child, str(id(sibling)))  # Each child is connected to its immediate sibling/parent
             sibling = sibling.sibling
 
     # Start traversal from the root
@@ -62,6 +80,176 @@ def draw_tree(root):
         print(f"Syntax tree generated successfully: {filepath}")
     except Exception as e:
         print(f"Error while generating the syntax tree: {e}")
+
+
+
+#Perfect
+# def draw_tree(root):
+#     """
+#     Draw the syntax tree structure using Graphviz, ensuring unique node identifiers,
+#     placing sibling nodes on the same horizontal level, and connecting them with horizontal edges.
+#
+#     Parameters:
+#         root (Node): The root node of the tree.
+#     """
+#     dot = Digraph(format='png', graph_attr={'rankdir': 'TB'})  # Top-to-Bottom layout
+#
+#     def traverse(node, parent_id=None):
+#         if node is None:
+#             return
+#
+#         # Create a unique identifier for the node
+#         node_id = str(id(node))
+#
+#         # Add the current node to the graph
+#         dot.node(node_id, label=node.name, shape=node.shape)
+#
+#         # Connect to the parent if specified
+#         if parent_id:
+#             dot.edge(parent_id, node_id)
+#
+#         # Handle siblings
+#         sibling_group = []
+#         sibling = node
+#         while sibling:
+#             sibling_id = str(id(sibling))
+#             dot.node(sibling_id, label=sibling.name, shape=sibling.shape)
+#             sibling_group.append(sibling_id)
+#             sibling = sibling.sibling
+#
+#         # Ensure siblings are at the same level and connect them with horizontal edges
+#         if len(sibling_group) > 1:
+#             with dot.subgraph() as s:
+#                 s.attr(rank="same")  # Align siblings horizontally
+#                 for sibling_id in sibling_group:
+#                     s.node(sibling_id)
+#             # Add horizontal edges between siblings
+#             for i in range(len(sibling_group) - 1):
+#                 dot.edge(sibling_group[i], sibling_group[i + 1], constraint="false")
+#
+#         # Process children for each sibling
+#         sibling = node
+#         while sibling:
+#             for child in sibling.children:
+#                 traverse(child, str(id(sibling)))
+#             sibling = sibling.sibling
+#
+#     # Start traversal from the root
+#     traverse(root)
+#
+#     # Render the tree
+#     try:
+#         filepath = dot.render('tree', view=True)
+#         print(f"Syntax tree generated successfully: {filepath}")
+#     except Exception as e:
+#         print(f"Error while generating the syntax tree: {e}")
+
+# #Woriking with no siblings edge
+# def draw_tree(root):
+#     """
+#     Draw the syntax tree structure using Graphviz, ensuring unique node identifiers,
+#     placing sibling nodes on the same horizontal level, and correctly drawing their children.
+#
+#     Parameters:
+#         root (Node): The root node of the tree.
+#     """
+#     dot = Digraph(format='png', graph_attr={'rankdir': 'TB'})  # Top-to-Bottom layout
+#
+#     def traverse(node, parent_id=None):
+#         if node is None:
+#             return
+#
+#         # Create a unique identifier for the node
+#         node_id = str(id(node))
+#
+#         # Add the current node to the graph
+#         dot.node(node_id, label=node.name, shape=node.shape)
+#
+#         # Connect to the parent if specified
+#         if parent_id:
+#             dot.edge(parent_id, node_id)
+#
+#         # Process children
+#         for child in node.children:
+#             traverse(child, node_id)
+#
+#         # Handle siblings
+#         sibling_group = []
+#         sibling = node
+#         while sibling:
+#             sibling_id = str(id(sibling))
+#             dot.node(sibling_id, label=sibling.name, shape=sibling.shape)
+#             sibling_group.append(sibling_id)
+#             sibling = sibling.sibling
+#
+#         # Ensure siblings are at the same level
+#         if len(sibling_group) > 1:
+#             with dot.subgraph() as s:
+#                 s.attr(rank="same")
+#                 for sibling_id in sibling_group:
+#                     s.node(sibling_id)
+#
+#         # Recursively process siblings
+#         sibling = node.sibling
+#         while sibling:
+#             traverse(sibling)
+#             sibling = sibling.sibling
+#
+#     # Start traversal from the root
+#     traverse(root)
+#
+#     # Render the tree
+#     try:
+#         filepath = dot.render('tree', view=True)
+#         print(f"Syntax tree generated successfully: {filepath}")
+#     except Exception as e:
+#         print(f"Error while generating the syntax tree: {e}")
+
+
+
+
+# def draw_tree(root):
+#     """
+#     Draw the syntax tree structure using Graphviz, ensuring unique node identifiers.
+#
+#     Parameters:
+#         root (Node): The root node of the tree.
+#     """
+#     dot = Digraph(format='png', graph_attr={'rankdir': 'TB'})  # Top-to-Bottom layout
+#
+#     def traverse(node, parent_id=None):
+#         if node is None:
+#             return
+#
+#         # Create a unique identifier for the node (e.g., memory address)
+#         node_id = str(id(node))
+#
+#         # Add the current node to the graph
+#         dot.node(node_id, label=node.name, shape=node.shape)
+#
+#         # If there's a parent, add an edge
+#         if parent_id:
+#             dot.edge(parent_id, node_id)
+#
+#         # Add child nodes
+#         for child in node.children:
+#             traverse(child, node_id)
+#
+#         # Process siblings
+#         sibling = node.sibling
+#         while sibling:
+#             traverse(sibling, parent_id)
+#             sibling = sibling.sibling
+#
+#     # Start traversal from the root
+#     traverse(root)
+#
+#     # Render the tree
+#     try:
+#         filepath = dot.render('tree', view=True)
+#         print(f"Syntax tree generated successfully: {filepath}")
+#     except Exception as e:
+#         print(f"Error while generating the syntax tree: {e}")
 
 
 class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
@@ -344,6 +532,18 @@ class Scanner:
             print("The input program is valid. Syntax Tree:")
             print(tree_root)
 
+            child1 = Node("Child1", "box")
+            child2 = Node("Child2", "box")
+            grandchild1 = Node("Grandchild1", "circle")
+            grandchild2 = Node("Grandchild2", "circle")
+            grandchild3 = Node("Grandchild3", "circle")
+            grandchild4 = Node("Grandchild4", "circle")
+            grandchild3.add_sibling(grandchild4)
+            child1.add_sibling(child2)
+            child1.add_child(grandchild1)
+            child1.add_child(grandchild2)
+
+            child2.add_child(grandchild3)
             # Draw the tree using the draw_tree function
             dot = draw_tree(tree_root)
             dot.render("tree", format="png", cleanup=True)  # Generates 'tree.png'

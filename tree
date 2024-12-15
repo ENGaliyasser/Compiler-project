@@ -1,14 +1,39 @@
 digraph {
-	"read(id(x))" [label="read(id(x))" shape=rectangle]
-	if [label=if shape=rectangle]
-	"<" [label="<" shape=oval]
-	if -> "<"
-	"const(0)" [label="const(0)" shape=oval]
-	"<" -> "const(0)"
-	"id(x)" [label="id(x)" shape=oval]
-	"<" -> "id(x)"
-	write [label=write shape=rectangle]
-	if -> write
-	"id(fact)" [label="id(fact)" shape=oval]
-	write -> "id(fact)"
+	graph [rankdir=TB]
+	2415253094816 [label=if shape=rectangle]
+	2415253094816 [label=if shape=rectangle]
+	2415135627104 [label="op(<)" shape=oval]
+	2415253094816 -> 2415135627104
+	2415135627104 [label="op(<)" shape=oval]
+	2415253164000 [label="id(x)" shape=oval]
+	2415135627104 -> 2415253164000
+	2415253164000 [label="id(x)" shape=oval]
+	2415257784864 [label="id(y)" shape=oval]
+	2415135627104 -> 2415257784864
+	2415257784864 [label="id(y)" shape=oval]
+	2415258287616 [label="assign(id(x))" shape=rectangle]
+	2415253094816 -> 2415258287616
+	2415258287616 [label="assign(id(x))" shape=rectangle]
+	2415258341104 [label="read(id(x))" shape=rectangle]
+	2415257783712 [label=write shape=rectangle]
+	{
+		rank=same
+		2415258287616
+		2415258341104
+		2415257783712
+	}
+	2415258287616 -> 2415258341104 [constraint=false]
+	2415258341104 -> 2415257783712 [constraint=false]
+	2415258341152 [label="const(1)" shape=oval]
+	2415258287616 -> 2415258341152
+	2415258341152 [label="const(1)" shape=oval]
+	2415258340912 [label="id(y)" shape=oval]
+	2415257783712 -> 2415258340912
+	2415258340912 [label="id(y)" shape=oval]
+	2415258341824 [label="assign(id(x))" shape=rectangle]
+	2415253094816 -> 2415258341824
+	2415258341824 [label="assign(id(x))" shape=rectangle]
+	2415258342016 [label="id(y)" shape=oval]
+	2415258341824 -> 2415258342016
+	2415258342016 [label="id(y)" shape=oval]
 }

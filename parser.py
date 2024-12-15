@@ -38,6 +38,7 @@ def draw_tree(root):
 
     # Render the tree
     return dot.render('syntax_tree', view=True)
+
 class Node:
     """A class to represent a node in the syntax tree."""
 
@@ -66,7 +67,7 @@ class Node:
 
     def __str__(self, level=0):
         """Recursively print the tree structure, including siblings."""
-        ret = "  " * level + f"{self.name}\n"
+        ret = "  " * level + f"{self.name}{level: {level}}\n"
         for child in self.children:
             ret += child.__str__(level + 1)
 
@@ -78,6 +79,7 @@ class Node:
 
 
 
+operators = [')' , '(' , ';' , '<' , '=' , '/' , ':=' , '*' , '-' , '+' ]
 class Parser:
     def __init__(self, tokens_list):
         """Initialize the parser with a list of tokens."""
@@ -111,6 +113,10 @@ class Parser:
                 self.advance()
                 if expected == "NUMBER":
                     return Node(f"const({matched_token[0]})","oval")
+                elif expected == "REPEAT":
+                    return Node("repeat","rectangle")
+                elif expected in operators:
+                    return Node(f"op({matched_token[0]})","oval")
                 elif expected == "IDENTIFIER":
                     return Node(f"id({matched_token[0]})","oval")
                 else:
