@@ -192,6 +192,8 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         drawer = SyntaxTreeDrawer(self.graphicsView, root)
         if not parser.errors:
             drawer.draw_tree()
+        elif self.scanner.errors:
+            drawer.display_message(f"Scanner Error: {self.scanner.errors[0]}")
         else:
             drawer.display_message(f"Error: {parser.errors[0]}")
 
