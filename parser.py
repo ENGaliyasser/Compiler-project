@@ -87,6 +87,7 @@ class Parser:
         self.current_token_index = 0
         self.current_token = None
         self.advance()  # Initialize with the first token
+        self.errors = []
 
     def advance(self):
         """Move to the next token."""
@@ -101,7 +102,8 @@ class Parser:
     def error(self, message):
         """Raise an error with a message."""
         print(f"Syntax Error: {message}")
-        raise SyntaxError(message)
+        self.errors.append(f"Syntax Error: {message}")
+        #raise SyntaxError(message)
 
     def match(self, expected):
         """Match the current token with an expected value or type."""
@@ -134,6 +136,7 @@ class Parser:
             self.match(';')  # Consume the semicolon
 
     def program(self):
+        # self.errors = []
         """Parse the program rule."""
         print("Parsing program.")
         program_node = self.stmt_sequence()
