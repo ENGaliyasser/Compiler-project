@@ -1,39 +1,77 @@
 digraph {
 	graph [rankdir=TB]
-	2415253094816 [label=if shape=rectangle]
-	2415253094816 [label=if shape=rectangle]
-	2415135627104 [label="op(<)" shape=oval]
-	2415253094816 -> 2415135627104
-	2415135627104 [label="op(<)" shape=oval]
-	2415253164000 [label="id(x)" shape=oval]
-	2415135627104 -> 2415253164000
-	2415253164000 [label="id(x)" shape=oval]
-	2415257784864 [label="id(y)" shape=oval]
-	2415135627104 -> 2415257784864
-	2415257784864 [label="id(y)" shape=oval]
-	2415258287616 [label="assign(id(x))" shape=rectangle]
-	2415253094816 -> 2415258287616
-	2415258287616 [label="assign(id(x))" shape=rectangle]
-	2415258341104 [label="read(id(x))" shape=rectangle]
-	2415257783712 [label=write shape=rectangle]
+	2160125025632 [label="read(id(x))" shape=rectangle]
+	2160125025632 [label="read(id(x))" shape=rectangle]
+	2160116100000 [label=if shape=rectangle]
 	{
 		rank=same
-		2415258287616
-		2415258341104
-		2415257783712
+		2160125025632
+		2160116100000
 	}
-	2415258287616 -> 2415258341104 [constraint=false]
-	2415258341104 -> 2415257783712 [constraint=false]
-	2415258341152 [label="const(1)" shape=oval]
-	2415258287616 -> 2415258341152
-	2415258341152 [label="const(1)" shape=oval]
-	2415258340912 [label="id(y)" shape=oval]
-	2415257783712 -> 2415258340912
-	2415258340912 [label="id(y)" shape=oval]
-	2415258341824 [label="assign(id(x))" shape=rectangle]
-	2415253094816 -> 2415258341824
-	2415258341824 [label="assign(id(x))" shape=rectangle]
-	2415258342016 [label="id(y)" shape=oval]
-	2415258341824 -> 2415258342016
-	2415258342016 [label="id(y)" shape=oval]
+	2160125025632 -> 2160116100000 [constraint=false]
+	2160113100912 [label="op(<)" shape=oval]
+	2160116100000 -> 2160113100912
+	2160113100912 [label="op(<)" shape=oval]
+	2160115802400 [label="const(0)" shape=oval]
+	2160113100912 -> 2160115802400
+	2160115802400 [label="const(0)" shape=oval]
+	2160129848432 [label="id(x)" shape=oval]
+	2160113100912 -> 2160129848432
+	2160129848432 [label="id(x)" shape=oval]
+	2160129848576 [label="assign(id(fact))" shape=rectangle]
+	2160116100000 -> 2160129848576
+	2160129848576 [label="assign(id(fact))" shape=rectangle]
+	2160007254848 [label=repeat shape=rectangle]
+	2160129849872 [label=write shape=rectangle]
+	{
+		rank=same
+		2160129848576
+		2160007254848
+		2160129849872
+	}
+	2160129848576 -> 2160007254848 [constraint=false]
+	2160007254848 -> 2160129849872 [constraint=false]
+	2160129848624 [label="const(1)" shape=oval]
+	2160129848576 -> 2160129848624
+	2160129848624 [label="const(1)" shape=oval]
+	2160129848672 [label="assign(id(fact))" shape=rectangle]
+	2160007254848 -> 2160129848672
+	2160129848672 [label="assign(id(fact))" shape=rectangle]
+	2160129849008 [label="assign(id(x))" shape=rectangle]
+	{
+		rank=same
+		2160129848672
+		2160129849008
+	}
+	2160129848672 -> 2160129849008 [constraint=false]
+	2160129848720 [label="op(*)" shape=oval]
+	2160129848672 -> 2160129848720
+	2160129848720 [label="op(*)" shape=oval]
+	2160129848768 [label="id(fact)" shape=oval]
+	2160129848720 -> 2160129848768
+	2160129848768 [label="id(fact)" shape=oval]
+	2160129848912 [label="id(x)" shape=oval]
+	2160129848720 -> 2160129848912
+	2160129848912 [label="id(x)" shape=oval]
+	2160129849248 [label="op(-)" shape=oval]
+	2160129849008 -> 2160129849248
+	2160129849248 [label="op(-)" shape=oval]
+	2160129849152 [label="id(x)" shape=oval]
+	2160129849248 -> 2160129849152
+	2160129849152 [label="id(x)" shape=oval]
+	2160129849440 [label="const(1)" shape=oval]
+	2160129849248 -> 2160129849440
+	2160129849440 [label="const(1)" shape=oval]
+	2160129849536 [label="op(=)" shape=oval]
+	2160007254848 -> 2160129849536
+	2160129849536 [label="op(=)" shape=oval]
+	2160129848960 [label="id(x)" shape=oval]
+	2160129849536 -> 2160129848960
+	2160129848960 [label="id(x)" shape=oval]
+	2160129849680 [label="const(0)" shape=oval]
+	2160129849536 -> 2160129849680
+	2160129849680 [label="const(0)" shape=oval]
+	2160129849824 [label="id(fact)" shape=oval]
+	2160129849872 -> 2160129849824
+	2160129849824 [label="id(fact)" shape=oval]
 }

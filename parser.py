@@ -1,43 +1,3 @@
-from graphviz import Digraph
-
-
-from graphviz import Digraph
-
-def draw_tree(root):
-    """
-    Draw the syntax tree structure using Graphviz.
-
-    Parameters:
-        root (Node): The root node of the tree.
-    """
-    dot = Digraph(format='png')  # You can adjust the format if needed
-
-    def traverse(node, parent_id=None):
-        if node is None:
-            return
-
-        # Add the current node to the graph
-        dot.node(node.name, label=node.name, shape=node.shape)
-
-        # If there's a parent, add an edge
-        if parent_id:
-            dot.edge(parent_id, node.name)
-
-        # Recursively add children
-        for child in node.children:
-            traverse(child, node.name)
-
-        # Process siblings
-        sibling = node.sibling
-        while sibling:
-            traverse(sibling, parent_id)
-            sibling = sibling.sibling
-
-    # Start traversal from the root
-    traverse(root)
-
-    # Render the tree
-    return dot.render('syntax_tree', view=True)
 
 class Node:
     """A class to represent a node in the syntax tree."""
@@ -286,30 +246,7 @@ class Parser:
                 self.error("Invalid factor")
         self.error("Invalid factor")
 
-    # def draw_syntax_tree(self):
-    #     """
-    #     Draws the syntax tree using Graphviz.
-    #
-    #     Args:
-    #         root (Node): The root of the syntax tree.
-    #         scanner (Scanner): The scanner object containing tokens.
-    #     """
-    #     # Extract the token list from the Scanner instance
-    #
-    #
-    #     # globall_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
-    #
-    #     # parser = Parser(globall_tokens_list)
-    #     try:
-    #         tree_root = self.program()
-    #         print("The input program is valid. Syntax Tree:")
-    #         print(tree_root)
-    #
-    #         # Draw the tree using the draw_tree function
-    #         dot = draw_tree(tree_root)
-    #         dot.render("tree", format="png", cleanup=True)  # Generates 'tree.png'
-    #     except Exception as e:
-    #         print(f"Error while generating the syntax tree: {e}")
+
 
 
 
