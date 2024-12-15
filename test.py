@@ -19,3 +19,12 @@ dot.render('tree', format='png', cleanup=True)
 
 # Save the tree as a PNG image
 # dot.render('tree', format='png', cleanup=True)
+read x; {input an integer }
+ if 0 < x then { don’t compute if x <= 0 }
+ fact := 1;
+ repeat
+ fact := fact * x;
+ x := x - 1
+ until x = 0;
+ write fact {output factorial of x }
+ end
