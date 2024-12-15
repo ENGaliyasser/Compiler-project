@@ -1,5 +1,11 @@
 Tokens:
 Line  Token        Type        
 ====  ====         =====       
-1     x            IDENTIFIER  
-1     x            IDENTIFIER  
+1     read         READ        
+1     y            IDENTIFIER  
+1     ;            SEMICOLON   
+1     write        WRITE       
+1     y            IDENTIFIER  
+1     ;            SEMICOLON   
+1     read         READ        
+1     y            IDENTIFIER  
