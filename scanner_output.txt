@@ -1,15 +1,7 @@
 Tokens:
 Line  Token        Type        
 ====  ====         =====       
-1     read         READ        
-1     x            IDENTIFIER  
-1     ;            SEMICOLON   
-2     if           IF          
-2     0            NUMBER      
-2     <            LESSTHAN    
-2     x            IDENTIFIER  
-2     then         THEN        
-3     vhjhjhjgjhggjghjk IDENTIFIER  
+1     ghfgfhgjgihkhj IDENTIFIER  
 
 Errors:
-Line 3: UNCLOSED COMMENT
+Line 1: NOT ALLOWED NESTED COMMENT
