@@ -30,7 +30,6 @@ The first release focuses on the **Scanner** module, which is responsible for:
 
 #### **Future Plans**  
 Upcoming versions will include:  
-- **Parser** for syntax analysis.  
 - **Semantic Analyzer** for type and context validation.  
 - **Code Generator** for producing executable output.  
 
