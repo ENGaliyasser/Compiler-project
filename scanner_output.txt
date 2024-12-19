@@ -1,7 +1,13 @@
 Tokens:
 Line  Token        Type        
 ====  ====         =====       
-1     ghfgfhgjgihkhj IDENTIFIER  
+1     import       IDENTIFIER  
+1     pygame       IDENTIFIER  
+2     import       IDENTIFIER  
+2     sys          IDENTIFIER  
+3     from         IDENTIFIER  
+3     PyQt         IDENTIFIER  
+3     5            NUMBER      
 
 Errors:
-Line 1: NOT ALLOWED NESTED COMMENT
+Line 3: Invalid token: .

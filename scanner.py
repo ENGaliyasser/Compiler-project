@@ -9,7 +9,7 @@ from parser import Parser
 
 
 from graphviz import Digraph
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsScene, QGraphicsRectItem, QMessageBox
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsScene, QGraphicsRectItem, QMessageBox,QFileDialog
 from PyQt5.QtGui import QPen, QBrush
 from PyQt5.QtCore import Qt, QPointF
 
@@ -133,30 +133,60 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
         self.Browse.clicked.connect(self.browse_file)  # Connect the browse button to the browse function
         self.parse.clicked.connect(self.parser)  # Connect the browse button to the browse function
 
-
-
-
-
     def browse_file(self):
+        """Handles file selection and loads it into the input text area."""
         options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open Code File", "",
-                                                             "Text Files (*.txt);;All Files (*)", options=options)
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Open Code File",
+            "",
+            "Text Files (*.txt);;All Files (*)",
+            options=options
+        )
         if file_name:
-            # Read the content of the file
+            # Check if the selected file has a .txt extension
+            if not file_name.lower().endswith('.txt'):
+                QMessageBox.warning(
+                    self,
+                    "File Type Error",
+                    "Please select a file with a .txt extension."
+                )
+                return  # Exit the method since the file is not a .txt file
 
-            with open(file_name, 'r') as file:
-                file_content = file.read()
-            # Set the content of the file in the input QTextEdit
-
-            self.input.setPlainText(file_content)
-            self.Browseline.setText(str(file_name))  # Set the text of the line edit to the selected file name (file_name)
-
-
+            try:
+                with open(file_name, 'r') as file:
+                    file_content = file.read()
+                self.input.setPlainText(file_content)
+                self.Browseline.setText(str(file_name))
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "File Error",
+                    f"An error occurred while opening the file:\n{e}"
+                )
+        else:
+            QMessageBox.information(
+                self,
+                "No File Selected",
+                "No file was selected."
+            )
 
     def Scan(self):
 
+        """Performs lexical analysis on the input code."""
+
         user_input = self.input.toPlainText().splitlines()
         user_code = "\n".join(user_input)
+
+        # Check if the input code is empty
+        if not user_code.strip():
+            # Display an error message
+            QMessageBox.warning(
+                self,
+                "Input Error",
+                "No input provided. Please enter code in the input area or select a file."
+            )
+            return  # Exit the method early since there's nothing to scan
 
         # Initialize scanner and perform scanning
         self.scanner = Scanner()
@@ -182,8 +212,17 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
 
 
     def parser(self):
-        # Load the tree image
-        # Create a scene if it doesn't exist already
+
+        """Generates and displays the syntax tree."""
+
+        # Check if there are tokens available
+        if not hasattr(self, 'scanner') or not self.scanner.tokens:
+            QMessageBox.warning(
+                self,
+                "Parsing Error",
+                "No tokens available for parsing. Please perform scanning first."
+            )
+            return
 
         globall_tokens_list = [(token, token_type) for _, token, token_type in self.scanner.tokens]
         parser = Parser(globall_tokens_list)
