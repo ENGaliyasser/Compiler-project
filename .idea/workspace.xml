@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37e2bbe6-e938-4ee7-9c37-63a13dfcee0d" name="Changes" comment=".">
+    <list default="true" id="37e2bbe6-e938-4ee7-9c37-63a13dfcee0d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/TINY-Compiler.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TINY-Compiler.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/scanner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scanner_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/scanner_output.txt" afterDir="false" />
@@ -27,6 +27,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ENGaliyasser&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ENGaliyasser/TINY-Compiler.git&quot;,
+    &quot;accountId&quot;: &quot;28fd4266-8633-4754-a02f-d8829ab20d49&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -43,16 +55,41 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.__init__.executor": "Run",
     "Python.parser.executor": "Run",
     "Python.scanner.executor": "Run",
-    "Python.test.executor": "Debug",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "Merging main",
-    "last_opened_file_path": "E:/Senior _Two_First_Term/Design of compilers/LAST/TINY-Compiler"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/Senior _Two_First_Term/Design of compilers/Final/TINY-Compiler",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="scanner" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="TINY-Compiler" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (python projects)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scanner.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -81,9 +118,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
   </component>
 </project>
