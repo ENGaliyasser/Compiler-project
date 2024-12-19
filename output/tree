@@ -1,0 +1,77 @@
+digraph {
+	graph [rankdir=TB]
+	2842941750064 [label="read(id(x))" shape=rectangle]
+	2842941750064 [label="read(id(x))" shape=rectangle]
+	2842668356512 [label=if shape=rectangle]
+	{
+		rank=same
+		2842941750064
+		2842668356512
+	}
+	2842941750064 -> 2842668356512 [constraint=false]
+	2842941750016 [label="op(<)" shape=oval]
+	2842668356512 -> 2842941750016
+	2842941750016 [label="op(<)" shape=oval]
+	2842916029216 [label="const(0)" shape=oval]
+	2842941750016 -> 2842916029216
+	2842916029216 [label="const(0)" shape=oval]
+	2842941750976 [label="id(x)" shape=oval]
+	2842941750016 -> 2842941750976
+	2842941750976 [label="id(x)" shape=oval]
+	2842941751120 [label="assign(id(fact))" shape=rectangle]
+	2842668356512 -> 2842941751120
+	2842941751120 [label="assign(id(fact))" shape=rectangle]
+	2842941751072 [label=repeat shape=rectangle]
+	2842941768912 [label=write shape=rectangle]
+	{
+		rank=same
+		2842941751120
+		2842941751072
+		2842941768912
+	}
+	2842941751120 -> 2842941751072 [constraint=false]
+	2842941751072 -> 2842941768912 [constraint=false]
+	2842941751216 [label="const(1)" shape=oval]
+	2842941751120 -> 2842941751216
+	2842941751216 [label="const(1)" shape=oval]
+	2842941751264 [label="assign(id(fact))" shape=rectangle]
+	2842941751072 -> 2842941751264
+	2842941751264 [label="assign(id(fact))" shape=rectangle]
+	2842941768048 [label="assign(id(x))" shape=rectangle]
+	{
+		rank=same
+		2842941751264
+		2842941768048
+	}
+	2842941751264 -> 2842941768048 [constraint=false]
+	2842941767760 [label="op(*)" shape=oval]
+	2842941751264 -> 2842941767760
+	2842941767760 [label="op(*)" shape=oval]
+	2842941767808 [label="id(fact)" shape=oval]
+	2842941767760 -> 2842941767808
+	2842941767808 [label="id(fact)" shape=oval]
+	2842941767952 [label="id(x)" shape=oval]
+	2842941767760 -> 2842941767952
+	2842941767952 [label="id(x)" shape=oval]
+	2842941768288 [label="op(-)" shape=oval]
+	2842941768048 -> 2842941768288
+	2842941768288 [label="op(-)" shape=oval]
+	2842941768192 [label="id(x)" shape=oval]
+	2842941768288 -> 2842941768192
+	2842941768192 [label="id(x)" shape=oval]
+	2842941768480 [label="const(1)" shape=oval]
+	2842941768288 -> 2842941768480
+	2842941768480 [label="const(1)" shape=oval]
+	2842941768576 [label="op(=)" shape=oval]
+	2842941751072 -> 2842941768576
+	2842941768576 [label="op(=)" shape=oval]
+	2842941768000 [label="id(x)" shape=oval]
+	2842941768576 -> 2842941768000
+	2842941768000 [label="id(x)" shape=oval]
+	2842941768720 [label="const(0)" shape=oval]
+	2842941768576 -> 2842941768720
+	2842941768720 [label="const(0)" shape=oval]
+	2842941768864 [label="id(fact)" shape=oval]
+	2842941768912 -> 2842941768864
+	2842941768864 [label="id(fact)" shape=oval]
+}
