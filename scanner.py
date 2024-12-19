@@ -4,17 +4,15 @@ import os
 
 # PyQt5 imports
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QGraphicsScene, QFileDialog, QMessageBox
 from PyQt5.QtCore import QRectF
-
 # Third-party library imports
 from graphviz import Digraph
 
 # Local module imports
 from gui import Ui_MainWindow
-from parser import Parser, Node
-
+from parser import Parser, Node, ParserError
 def draw_tree(root):
     """
     Draws a syntax tree using Graphviz with a hierarchical layout.
@@ -133,18 +131,61 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
                 "No tokens available for parsing. Please perform scanning first."
             )
             return
+        #check if there are scanner errors
+        if self.scanner.errors:
+            error = self.scanner.errors[0]
+            QMessageBox.warning(
+                self,
+                "Scanner Error",
+                f"Cant parse, Scanner Error:{error}"
+            )
+            return
 
-        self.scanner.draw_syntax_tree()
-        time.sleep(0.5)  # Small delay to ensure the image is generated
+        if self.draw_syntax_tree():
+            time.sleep(0.5)  # Small delay to ensure the image is generated
 
-        # Load and display the syntax tree image
-        scene = QGraphicsScene()
-        pixmap = QPixmap("tree.png")
-        scene.addPixmap(pixmap)
-        scene.setSceneRect(QRectF(pixmap.rect()))
+            # Load and display the syntax tree image
+            scene = QGraphicsScene()
+            pixmap = QPixmap("tree.png")
+            scene.addPixmap(pixmap)
+            scene.setSceneRect(QRectF(pixmap.rect()))
 
-        self.graphicsView.setScene(scene)
-        self.graphicsView.fitInView(scene.sceneRect(), mode=1)  # Keep aspect ratio
+            self.graphicsView.setScene(scene)
+            self.graphicsView.fitInView(scene.sceneRect(), mode=1)  # Keep aspect ratio
+
+    def draw_syntax_tree(self):
+        """
+        Draws the syntax tree using Graphviz based on the scanned tokens.
+        """
+        # Extract the token list from the Scanner instance
+        global_tokens_list = [(token, token_type) for _, token, token_type in self.scanner.tokens]
+
+        parser = Parser(global_tokens_list)
+        try:
+            tree_root = parser.program()
+            if not parser.errors:
+                # No errors, draw the syntax tree
+                draw_tree(tree_root)
+                return True
+            else:
+                # Handle parser errors
+                error_messages = "\n".join(f"Line {line}: {msg}" for line, msg in parser.errors)
+                QMessageBox.warning(
+                    self,
+                    "Parsing Errors",
+                    f"Parser errors:\n{error_messages}"
+                )
+                return False
+        except ParserError as e:
+            # Handle any unexpected termination of parsing
+            print(f"Parsing failed: {e}")
+            # Display the error message using a QMessageBox
+            QMessageBox.warning(
+                self,
+                "Parsing Error",
+                f"Parsing failed: {str(e)}"
+            )
+            return False
 
     def _format_scanner_output(self):
         """Formats scanner output for display."""
@@ -349,37 +390,6 @@ class Scanner:
         """Check if the token is a valid operator symbol."""
         return token in ['+', '-', '*', '/', '=', '<', ';', '(', ')']
 
-    def draw_syntax_tree(self):
-        """
-        Draws the syntax tree using Graphviz based on the scanned tokens.
-        """
-        # Extract the token list from the Scanner instance
-        globall_tokens_list = [(token, token_type) for _, token, token_type in self.tokens]
-
-        parser = Parser(globall_tokens_list)
-        try:
-            tree_root = parser.program()
-            print("The input program is valid. Syntax Tree:")
-            print(tree_root)
-
-            # Additional nodes (example)
-            child1 = Node("Child1", "box")
-            child2 = Node("Child2", "box")
-            grandchild1 = Node("Grandchild1", "circle")
-            grandchild2 = Node("Grandchild2", "circle")
-            grandchild3 = Node("Grandchild3", "circle")
-            grandchild4 = Node("Grandchild4", "circle")
-            grandchild3.add_sibling(grandchild4)
-            child1.add_sibling(child2)
-            child1.add_child(grandchild1)
-            child1.add_child(grandchild2)
-            child2.add_child(grandchild3)
-
-            # Draw the tree using the draw_tree function
-            draw_tree(tree_root)
-
-        except Exception as e:
-            print(f"Error while generating the syntax tree: {e}")
 
     def output(self, output_file='scanner_output.txt'):
         """

@@ -40,6 +40,11 @@ class Node:
 
 
 operators = [')' , '(' , ';' , '<' , '=' , '/' , ':=' , '*' , '-' , '+' ]
+
+class ParserError(Exception):
+    """Custom exception for parser errors."""
+    pass
+
 class Parser:
     def __init__(self, tokens_list):
         """Initialize the parser with a list of tokens."""
@@ -47,6 +52,7 @@ class Parser:
         self.current_token_index = 0
         self.current_token = None
         self.advance()  # Initialize with the first token
+        self.errors = []
 
     def advance(self):
         """Move to the next token."""
@@ -59,9 +65,11 @@ class Parser:
             print("End of token stream reached.")
 
     def error(self, message):
-        """Raise an error with a message."""
-        print(f"Syntax Error: {message}")
-        raise SyntaxError(message)
+        """Raise an error with a message and stop parsing."""
+        error_message = f"Syntax Error: {message}"
+        print(error_message)
+        self.errors.append(error_message)
+        raise ParserError(error_message)
 
     def match(self, expected):
         """Match the current token with an expected value or type."""
