@@ -5,13 +5,13 @@ from PyQt5.QtGui import QTextCursor, QFont, QPixmap, QFontMetrics, QColor
 from gui import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-from parser import Parser
-
+from parser import Parser, ParserError
 
 from graphviz import Digraph
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsScene, QGraphicsRectItem, QMessageBox,QFileDialog
 from PyQt5.QtGui import QPen, QBrush
 from PyQt5.QtCore import Qt, QPointF
+from parser import Node
 
 
 
@@ -225,14 +225,31 @@ class Back_End_Class(QtWidgets.QWidget, Ui_MainWindow):
             return
 
         globall_tokens_list = [(token, token_type) for _, token, token_type in self.scanner.tokens]
-        parser = Parser(globall_tokens_list)
         print(self.scanner.tokens)
-        root = parser.program()
-        drawer = SyntaxTreeDrawer(self.graphicsView, root)
-        if not parser.errors:
-            drawer.draw_tree()
+        if self.scanner.errors:
+            drawer = SyntaxTreeDrawer(self.graphicsView, Node("no","Rectangle"))
+            drawer.display_message(f"Scanner Error: {self.scanner.errors[0]}")
         else:
-            drawer.display_message(f"Error: {parser.errors[0]}")
+            parser = Parser(globall_tokens_list)
+            try:
+                # Parse the program
+                root = parser.program()
+                # Initialize the drawer with the graphics view and the parsed tree
+                drawer = SyntaxTreeDrawer(self.graphicsView, root)
+                # Check for errors
+                if not parser.errors:
+                    # No errors, draw the syntax tree
+                    drawer.draw_tree()
+                else:
+                    # Display the first error message
+                    drawer.display_message(f"Error: {parser.errors[0]}")
+                    
+            except ParserError as e:
+                # Handle any unexpected termination of parsing
+                print(f"Parsing failed: {e}")
+                # Display the error message using the drawer
+                drawer = SyntaxTreeDrawer(self.graphicsView, None)  # Pass `None` for the tree
+                drawer.display_message(f"Error: {str(e)}")
 
 
 

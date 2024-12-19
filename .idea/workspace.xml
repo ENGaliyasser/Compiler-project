@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37e2bbe6-e938-4ee7-9c37-63a13dfcee0d" name="Changes" comment="">
+    <list default="true" id="37e2bbe6-e938-4ee7-9c37-63a13dfcee0d" name="Changes" comment=".">
+      <change beforePath="$PROJECT_DIR$/.idea/TINY-Compiler.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TINY-Compiler.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/scanner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scanner_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/scanner_output.txt" afterDir="false" />
     </list>
@@ -22,25 +25,8 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="99bae67566ffd5062e17a34709e58e6f80662473" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "ENGaliyasser"
-  }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ENGaliyasser/TINY-Compiler.git",
-    "accountId": "28fd4266-8633-4754-a02f-d8829ab20d49"
-  }
-}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -63,7 +49,7 @@
     "Python.test.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Merging main",
     "last_opened_file_path": "E:/Senior _Two_First_Term/Design of compilers/LAST/TINY-Compiler"
   }
 }]]></component>
@@ -95,5 +81,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="." />
+    <option name="LAST_COMMIT_MESSAGE" value="." />
   </component>
 </project>
