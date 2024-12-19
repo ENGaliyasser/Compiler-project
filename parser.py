@@ -245,12 +245,3 @@ class Parser:
             else:
                 self.error("Invalid factor")
         self.error("Invalid factor")
-
-
-
-
-
-
-
-
-
